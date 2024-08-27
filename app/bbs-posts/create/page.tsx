@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   username: z
@@ -30,6 +31,7 @@ const formSchema = z.object({
 });
 
 const CreateBBSPage = () => {
+  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,7 +41,22 @@ const CreateBBSPage = () => {
     },
   });
 
-  const onSubmit = async () => {};
+  const onSubmit = async (value: z.infer<typeof formSchema>) => {
+    const { username, title, content } = value;
+    try {
+      await fetch("http://localhost:3000/api/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, title, content }),
+      });
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="bg-slate-50 py-4">
