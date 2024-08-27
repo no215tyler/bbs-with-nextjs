@@ -2,7 +2,6 @@
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,9 +14,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
-import { useRouter } from "next/navigation";
+import { postBBS } from "@/app/actions/postBBSAction";
 
-const formSchema = z.object({
+export const formSchema = z.object({
   username: z
     .string()
     .min(2, { message: "ユーザー名は2文字以上で入力してください。" }),
@@ -31,7 +30,6 @@ const formSchema = z.object({
 });
 
 const CreateBBSPage = () => {
-  const router = useRouter();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,19 +41,7 @@ const CreateBBSPage = () => {
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     const { username, title, content } = value;
-    try {
-      await fetch("http://localhost:3000/api/post", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, title, content }),
-      });
-      router.push("/");
-      router.refresh();
-    } catch (err) {
-      console.error(err);
-    }
+    postBBS({ username, title, content });
   };
 
   return (
